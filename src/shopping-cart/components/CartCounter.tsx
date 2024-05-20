@@ -5,9 +5,21 @@ import { useAppSelector } from "@/store";
 import { addOne, initCounterState, substractOne } from "@/store/counter/counter-slice";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import counterSlice from '../../store/counter/counter-slice';
 
 interface Props{
   value? : number;
+}
+
+export interface CounterResponse{
+  count: number;
+}
+
+const getApiCounter = async(): Promise<CounterResponse> => {
+  const data = await fetch('/api/counter')
+  .then(res => res.json());
+
+  return data;
 }
 
 export const CartCounter = ({value = 0}: Props) => {
@@ -15,9 +27,14 @@ export const CartCounter = ({value = 0}: Props) => {
   const count = useAppSelector(state => state.counter.count);
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  /*useEffect(() => {
     dispatch(initCounterState(value));
-  }, [dispatch, value]);
+  }, [dispatch, value]);*/
+
+  useEffect(() => {
+    getApiCounter()
+    .then(({count}) => dispatch(initCounterState(count)));
+  }, [dispatch]);
 
   return (
     <>
